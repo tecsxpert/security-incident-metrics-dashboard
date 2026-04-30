@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 
 # Load environmen
-load_dotenv(dotenv_path=Path(__file__).resolve().parent[2] / ".env")
+load_dotenv(dotenv_path=Path(__file__).resolve().parents[1] / ".env")
 
 # Logging setup
 logging.basicConfig(
@@ -95,15 +95,13 @@ def internal_error(e):
 # Register blueprints
 from routes.describe  import describe_bp
 from routes.recommend import recommend_bp
+from routes.generate_report import generate_report_bp
 
 app.register_blueprint(describe_bp)
 app.register_blueprint(recommend_bp)
+app.register_blueprint(generate_report_bp)
 
-# Uncomment on Day 5
-# from routes.generate_report import generate_report_bp
-# app.register_blueprint(generate_report_bp)
-
-# ── Entry point ───────────────────────────────────────────────────
+#  Entry point
 if __name__ == "__main__":
     logger.info("Starting AI service on port 5000")
     app.run(host="0.0.0.0", port=5000, debug=False)

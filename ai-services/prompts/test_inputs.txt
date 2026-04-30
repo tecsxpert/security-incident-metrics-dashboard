@@ -33,7 +33,7 @@ affected_system: Web Application / Load Balancer
 description: Application experienced 450,000 requests per second for 3 hours causing complete service outage. Attack originated from 12 different countries.
 
 ---
-
+SS
 TEST INPUT 5 — Insider Threat
 title: Insider Data Exfiltration via USB Drive
 incident_type: Insider Threat
