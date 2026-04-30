@@ -1,0 +1,42 @@
+TEST INPUT 1 — Phishing Attack
+title: Phishing Email Campaign Targeting Finance Team
+incident_type: Phishing
+severity: High
+affected_system: Email Server / Finance Workstations
+description: 15 finance employees received emails impersonating the CFO requesting urgent wire transfers. 3 employees clicked malicious links exposing credentials.
+
+---
+
+TEST INPUT 2 — Ransomware
+title: Ransomware Infection on File Server
+incident_type: Ransomware
+severity: Critical
+affected_system: Windows File Server FS-01
+description: Ransomware encrypted 2TB of shared drives. Attackers demand $50,000 in Bitcoin. Backups are 3 days old. Production operations halted.
+
+---
+
+TEST INPUT 3 — Unauthorized Access
+title: Unauthorized Admin Access to Production Database
+incident_type: Unauthorized Access
+severity: Critical
+affected_system: PostgreSQL Production Database
+description: An ex-employee account was used to access the production database at 2AM. 50,000 customer records including PII were exported before detection.
+
+---
+
+TEST INPUT 4 — DDoS Attack
+title: DDoS Attack on Public Web Application
+incident_type: DDoS
+severity: High
+affected_system: Web Application / Load Balancer
+description: Application experienced 450,000 requests per second for 3 hours causing complete service outage. Attack originated from 12 different countries.
+
+---
+
+TEST INPUT 5 — Insider Threat
+title: Insider Data Exfiltration via USB Drive
+incident_type: Insider Threat
+severity: Medium
+affected_system: HR Workstation
+description: An HR employee copied confidential employee records to a personal USB drive before resignation. 200 employee records including salary and personal data were taken.
