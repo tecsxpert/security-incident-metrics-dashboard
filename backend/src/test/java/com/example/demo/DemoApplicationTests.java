@@ -8,6 +8,5 @@ class DemoApplicationTests {
 
     @Test
     void contextLoads() {
-        // This test just checks if Spring Boot context loads successfully
     }
 }

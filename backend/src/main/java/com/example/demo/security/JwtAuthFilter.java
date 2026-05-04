@@ -1,14 +1,17 @@
 package com.example.demo.security;
 
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.List;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -27,11 +30,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // ✅ SKIP PUBLIC ROUTES
-        if (path.startsWith("/auth") ||
-            path.startsWith("/v3") ||
-            path.startsWith("/swagger")) {
-
+        // ✅ SKIP PUBLIC ENDPOINTS
+        if (path.startsWith("/auth") || path.startsWith("/mail")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -42,24 +42,25 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             String token = header.substring(7);
 
-            try {
-                if (jwtUtil.validateToken(token)) {
+            if (jwtUtil.validateToken(token)) {
 
-                    String username = jwtUtil.extractUsername(token);
+                String username = jwtUtil.extractUsername(token);
+                String role = jwtUtil.extractRole(token);
 
-                    UsernamePasswordAuthenticationToken auth =
-                            new UsernamePasswordAuthenticationToken(
-                                    username,
-                                    null,
-                                    Collections.emptyList()
-                            );
-
-                    SecurityContextHolder.getContext().setAuthentication(auth);
+                // 🔥 FIX ROLE FORMAT SAFETY
+                if (!role.startsWith("ROLE_")) {
+                    role = "ROLE_" + role;
                 }
 
-            } catch (Exception e) {
-                System.out.println("JWT ERROR: " + e.getMessage());
+                UsernamePasswordAuthenticationToken auth =
+                        new UsernamePasswordAuthenticationToken(
+                                username,
+                                null,
+                                List.of(new SimpleGrantedAuthority(role))
+                        );
 
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }

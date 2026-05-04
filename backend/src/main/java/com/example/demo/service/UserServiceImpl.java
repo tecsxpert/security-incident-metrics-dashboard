@@ -1,25 +1,34 @@
-package com.example.demo.service;
+package com.example.demo.service.impl;
 
-import com.example.demo.entity.User;
-import com.example.demo.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl {
 
-    private final UserRepository userRepository;
+    // SIMPLE IN-MEMORY USERS (for capstone project)
+    private static final Map<String, String> USERS = new HashMap<>();
 
-    public UserServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    static {
+        USERS.put("admin", "admin123");
+        USERS.put("user", "user123");
     }
 
-    @Override
-    public User save(User user) {
-        return userRepository.save(user);
+    // Validate user credentials
+    public boolean validateUser(String username, String password) {
+        return USERS.containsKey(username)
+                && USERS.get(username).equals(password);
     }
 
-    @Override
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    // Get role based on username
+    public String getRole(String username) {
+        if ("admin".equals(username)) {
+            return "ROLE_ADMIN";
+        } else if ("user".equals(username)) {
+            return "ROLE_USER";
+        }
+        return null;
     }
 }
