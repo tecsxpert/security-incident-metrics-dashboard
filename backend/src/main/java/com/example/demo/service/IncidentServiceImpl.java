@@ -1,10 +1,10 @@
-package com.example.demo.service;
+package com.example.demo.service.impl;
 
 import com.example.demo.entity.Incident;
-import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.IncidentRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import com.example.demo.service.EmailService;
+import com.example.demo.service.IncidentService;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,53 +13,72 @@ import java.util.List;
 public class IncidentServiceImpl implements IncidentService {
 
     private final IncidentRepository repository;
+    private final EmailService emailService;
 
-    public IncidentServiceImpl(IncidentRepository repository) {
+    public IncidentServiceImpl(IncidentRepository repository,
+                               EmailService emailService) {
         this.repository = repository;
+        this.emailService = emailService;
     }
 
     @Override
+    public List<Incident> getAllIncidents() {
+        return repository.findAll();
+    }
+
+    @Override
+    @CacheEvict(value = "incidents", allEntries = true)
     public Incident createIncident(Incident incident) {
-        return repository.save(incident);
-    }
 
-    // ✅ FIXED (Pagination version for Day 4)
-    @Override
-    public Page<Incident> getAllIncidents(int page, int size) {
-        return repository.findAll(PageRequest.of(page, size));
+        Incident saved = repository.save(incident);
+
+        emailService.sendEmail(
+                "cinthiyajenniefer@gmail.com",
+                "🚨 New Incident Created",
+                "Incident ID: " + saved.getId() +
+                        "\nTitle: " + saved.getTitle() +
+                        "\nSeverity: " + saved.getSeverity()
+        );
+
+        return saved;
     }
 
     @Override
     public Incident getById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Incident not found: " + id));
+                .orElseThrow(() -> new RuntimeException("Incident not found"));
     }
 
     @Override
+    @CacheEvict(value = "incidents", allEntries = true)
     public Incident update(Long id, Incident incident) {
-        Incident existing = getById(id);
 
-        existing.setTitle(incident.getTitle());
-        existing.setDescription(incident.getDescription());
-        existing.setSeverity(incident.getSeverity());
-        existing.setStatus(incident.getStatus());
+        Incident existing = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Incident not found"));
+
+        if (incident.getTitle() != null)
+            existing.setTitle(incident.getTitle());
+
+        if (incident.getDescription() != null)
+            existing.setDescription(incident.getDescription());
+
+        if (incident.getSeverity() != null)
+            existing.setSeverity(incident.getSeverity());
+
+        if (incident.getStatus() != null)
+            existing.setStatus(incident.getStatus());
 
         return repository.save(existing);
     }
 
     @Override
+    @CacheEvict(value = "incidents", allEntries = true)
     public void delete(Long id) {
-        repository.delete(getById(id));
-    }
 
-    @Override
-    public List<Incident> getByStatus(String status) {
-        return repository.findByStatus(status);
-    }
+        if (!repository.existsById(id)) {
+            throw new RuntimeException("Incident not found");
+        }
 
-    @Override
-    public List<Incident> getBySeverity(String severity) {
-        return repository.findBySeverity(severity);
+        repository.deleteById(id);
     }
 }

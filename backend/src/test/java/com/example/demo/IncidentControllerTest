@@ -1,0 +1,124 @@
+package com.example.demo.controller;
+
+import com.example.demo.entity.Incident;
+import com.example.demo.service.IncidentService;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@WebMvcTest(IncidentController.class)
+@AutoConfigureMockMvc(addFilters = false) // 🔥 disables JWT + security
+public class IncidentControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private IncidentService incidentService;
+
+    // ✅ GET ALL
+    @Test
+    void testGetAllIncidents() throws Exception {
+
+        Incident incident = new Incident();
+        incident.setId(1L);
+        incident.setTitle("Test Issue");
+        incident.setDescription("Desc");
+        incident.setSeverity("LOW");
+        incident.setStatus("OPEN");
+
+        Mockito.when(incidentService.getAllIncidents())
+                .thenReturn(List.of(incident));
+
+        mockMvc.perform(get("/api/incidents"))
+                .andExpect(status().isOk());
+    }
+
+    // ✅ CREATE
+    @Test
+    void testCreateIncident() throws Exception {
+
+        Incident incident = new Incident();
+        incident.setTitle("New Issue");
+        incident.setDescription("Test Desc");
+        incident.setSeverity("MEDIUM");
+        incident.setStatus("OPEN");
+
+        Mockito.when(incidentService.createIncident(Mockito.any(Incident.class)))
+                .thenReturn(incident);
+
+        mockMvc.perform(post("/api/incidents")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "title":"New Issue",
+                                    "description":"Test Desc",
+                                    "severity":"MEDIUM",
+                                    "status":"OPEN"
+                                }
+                                """))
+                .andExpect(status().isOk());
+    }
+
+    // ✅ GET BY ID
+    @Test
+    void testGetById() throws Exception {
+
+        Incident incident = new Incident();
+        incident.setId(1L);
+        incident.setTitle("Issue");
+
+        Mockito.when(incidentService.getById(1L))
+                .thenReturn(incident);
+
+        mockMvc.perform(get("/api/incidents/1"))
+                .andExpect(status().isOk());
+    }
+
+    // ✅ DELETE
+    @Test
+    void testDelete() throws Exception {
+
+        Mockito.doNothing().when(incidentService).delete(1L);
+
+        mockMvc.perform(delete("/api/incidents/1"))
+                .andExpect(status().isOk());
+    }
+
+    // ✅ UPDATE (ADDED BONUS - IMPORTANT FOR VIVA)
+    @Test
+    void testUpdate() throws Exception {
+
+        Incident updated = new Incident();
+        updated.setId(1L);
+        updated.setTitle("Updated");
+        updated.setDescription("Updated Desc");
+        updated.setSeverity("HIGH");
+        updated.setStatus("CLOSED");
+
+        Mockito.when(incidentService.update(Mockito.eq(1L), Mockito.any(Incident.class)))
+                .thenReturn(updated);
+
+        mockMvc.perform(put("/api/incidents/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "title":"Updated",
+                                    "description":"Updated Desc",
+                                    "severity":"HIGH",
+                                    "status":"CLOSED"
+                                }
+                                """))
+                .andExpect(status().isOk());
+    }
+}
