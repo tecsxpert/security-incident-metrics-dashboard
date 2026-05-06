@@ -5,9 +5,14 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 @Entity
 @Table(name = "incident")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // 🔥 FIX ADDED
+@SQLDelete(sql = "UPDATE incident SET deleted = true WHERE id=?")
+@SQLRestriction("deleted = false")
 public class Incident {
 
     @Id
@@ -27,6 +32,8 @@ public class Incident {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     private LocalDateTime updatedAt = LocalDateTime.now();
+
+    private boolean deleted = false;
 
     // ✅ GETTERS & SETTERS
 

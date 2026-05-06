@@ -59,4 +59,41 @@ public class IncidentController {
         incidentService.delete(id);
         return ResponseEntity.ok("Deleted successfully");
     }
+
+    // ✅ SEARCH
+    @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    public ResponseEntity<List<Incident>> search(@RequestParam("q") String query) {
+        return ResponseEntity.ok(incidentService.search(query));
+    }
+
+    // ✅ EXPORT CSV
+    @GetMapping("/export")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    public ResponseEntity<String> exportCsv() {
+        List<Incident> incidents = incidentService.getAllIncidents();
+        StringBuilder csv = new StringBuilder("ID,Title,Severity,Status\n");
+        for (Incident i : incidents) {
+            csv.append(i.getId()).append(",")
+               .append(i.getTitle() != null ? i.getTitle().replace(",", " ") : "").append(",")
+               .append(i.getSeverity()).append(",")
+               .append(i.getStatus()).append("\n");
+        }
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=\"incidents.csv\"")
+                .body(csv.toString());
+    }
+
+    // ✅ UPLOAD CSV
+    @PostMapping("/upload")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> uploadCsv(@RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        if (file.isEmpty() || file.getOriginalFilename() == null || !file.getOriginalFilename().endsWith(".csv")) {
+            return ResponseEntity.badRequest().body("Invalid file type. Please upload a CSV.");
+        }
+        if (file.getSize() > 5 * 1024 * 1024) {
+            return ResponseEntity.badRequest().body("File size exceeds 5MB.");
+        }
+        return ResponseEntity.ok("File uploaded successfully.");
+    }
 }

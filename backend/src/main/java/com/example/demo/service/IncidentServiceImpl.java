@@ -81,4 +81,9 @@ public class IncidentServiceImpl implements IncidentService {
 
         repository.deleteById(id);
     }
+
+    @Override
+    public List<Incident> search(String query) {
+        return repository.findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query);
+    }
 }

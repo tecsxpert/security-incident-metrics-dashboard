@@ -14,4 +14,6 @@ public interface IncidentService {
     Incident update(Long id, Incident incident);
 
     void delete(Long id);
+
+    List<Incident> search(String query);
 }

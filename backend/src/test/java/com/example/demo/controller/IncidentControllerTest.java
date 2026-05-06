@@ -2,17 +2,27 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.Incident;
 import com.example.demo.service.IncidentService;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.ResponseEntity;
-import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-class IncidentControllerTest {
+import java.util.Arrays;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+public class IncidentControllerTest {
+
+    private MockMvc mockMvc;
 
     @Mock
     private IncidentService incidentService;
@@ -23,61 +33,74 @@ class IncidentControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        mockMvc = MockMvcBuilders.standaloneSetup(incidentController).build();
     }
 
     @Test
-    void testGetAll() {
-        Incident i = new Incident();
-        i.setId(1L);
-        i.setTitle("Test");
-        i.setSeverity("HIGH");
-        i.setStatus("OPEN");
-        when(incidentService.getAllIncidents()).thenReturn(List.of(i));
+    void getAllIncidents_ShouldReturnList() throws Exception {
+        Incident incident = new Incident();
+        incident.setTitle("Test");
+        when(incidentService.getAllIncidents()).thenReturn(Arrays.asList(incident));
 
-        ResponseEntity<List<Incident>> response = incidentController.getAll();
-        assertEquals(200, response.getStatusCode().value());
-        assertEquals(1, response.getBody().size());
+        mockMvc.perform(get("/api/incidents"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("Test"));
     }
 
     @Test
-    void testGetById() {
-        Incident i = new Incident();
-        i.setId(1L);
-        i.setTitle("Test");
-        when(incidentService.getById(1L)).thenReturn(i);
+    void getIncidentById_ShouldReturnIncident() throws Exception {
+        Incident incident = new Incident();
+        incident.setTitle("Test ID");
+        when(incidentService.getById(1L)).thenReturn(incident);
 
-        ResponseEntity<Incident> response = incidentController.getById(1L);
-        assertEquals(200, response.getStatusCode().value());
-        assertEquals("Test", response.getBody().getTitle());
+        mockMvc.perform(get("/api/incidents/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("Test ID"));
     }
 
     @Test
-    void testCreate() {
-        Incident i = new Incident();
-        i.setTitle("New");
-        i.setSeverity("HIGH");
-        i.setStatus("OPEN");
-        when(incidentService.createIncident(any())).thenReturn(i);
+    void createIncident_ShouldReturnCreatedIncident() throws Exception {
+        Incident incident = new Incident();
+        incident.setTitle("New");
+        when(incidentService.createIncident(any(Incident.class))).thenReturn(incident);
 
-        ResponseEntity<Incident> response = incidentController.create(i);
-        assertEquals(200, response.getStatusCode().value());
+        mockMvc.perform(post("/api/incidents")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"New\",\"severity\":\"HIGH\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("New"));
     }
 
     @Test
-    void testUpdate() {
-        Incident i = new Incident();
-        i.setTitle("Updated");
-        when(incidentService.update(eq(1L), any())).thenReturn(i);
+    void updateIncident_ShouldReturnUpdatedIncident() throws Exception {
+        Incident incident = new Incident();
+        incident.setTitle("Updated");
+        when(incidentService.update(anyLong(), any(Incident.class))).thenReturn(incident);
 
-        ResponseEntity<Incident> response = incidentController.update(1L, i);
-        assertEquals(200, response.getStatusCode().value());
+        mockMvc.perform(put("/api/incidents/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"Updated\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("Updated"));
     }
 
     @Test
-    void testDelete() {
+    void deleteIncident_ShouldReturnSuccess() throws Exception {
         doNothing().when(incidentService).delete(1L);
-        ResponseEntity<String> response = incidentController.delete(1L);
-        assertEquals(200, response.getStatusCode().value());
-        assertEquals("Deleted successfully", response.getBody());
+
+        mockMvc.perform(delete("/api/incidents/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Deleted successfully"));
+    }
+
+    @Test
+    void searchIncidents_ShouldReturnList() throws Exception {
+        Incident incident = new Incident();
+        incident.setTitle("Match");
+        when(incidentService.search("Match")).thenReturn(Arrays.asList(incident));
+
+        mockMvc.perform(get("/api/incidents/search?q=Match"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("Match"));
     }
 }
