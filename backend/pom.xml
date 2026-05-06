@@ -22,6 +22,18 @@
 
     <dependencies>
 
+        <!-- FLYWAY -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+
+        <!-- AOP -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+
         <!-- WEB -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

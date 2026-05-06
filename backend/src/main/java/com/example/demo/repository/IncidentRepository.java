@@ -7,4 +7,5 @@ import java.util.List;
 public interface IncidentRepository extends JpaRepository<Incident, Long> {
     List<Incident> findByStatus(String status);
     List<Incident> findBySeverity(String severity);
+    List<Incident> findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String title, String description);
 }
