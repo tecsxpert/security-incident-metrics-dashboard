@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tool-58 AI Summary Card</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0f1e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .card {
+    width: 794px;
+    min-height: 1123px;
+    background: #0d1428;
+    border: 1px solid #1b4f8a;
+    position: relative;
+    overflow: hidden;
+    padding: 48px;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #1b4f8a, #00d4ff, #1b4f8a);
+  }
+
+  .grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(27,79,138,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(27,79,138,0.08) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .content { position: relative; z-index: 1; }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 36px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid rgba(27,79,138,0.4);
+  }
+
+  .badge {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #00d4ff;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.1;
+  }
+
+  h1 span { color: #00d4ff; }
+
+  .tool-id {
+    background: rgba(27,79,138,0.3);
+    border: 1px solid #1b4f8a;
+    padding: 8px 16px;
+    font-size: 12px;
+    color: #00d4ff;
+    text-align: center;
+  }
+
+  .tool-id .num {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    display: block;
+    color: #fff;
+  }
+
+  .section { margin-bottom: 28px; }
+
+  .section-title {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: #1b4f8a;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(27,79,138,0.3);
+  }
+
+  .endpoints { display: flex; flex-direction: column; gap: 10px; }
+
+  .endpoint {
+    background: rgba(27,79,138,0.12);
+    border: 1px solid rgba(27,79,138,0.3);
+    border-left: 3px solid #1b4f8a;
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+
+  .endpoint-method {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .method-badge {
+    background: #1b4f8a;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    letter-spacing: 1px;
+  }
+
+  .endpoint-path {
+    color: #00d4ff;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .endpoint-desc { color: #8899aa; font-size: 11px; line-height: 1.5; }
+
+  .endpoint-returns {
+    color: #556677;
+    font-size: 10px;
+    margin-top: 4px;
+  }
+
+  .endpoint-returns span { color: #00d4ff; }
+
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .tech-item {
+    background: rgba(27,79,138,0.1);
+    border: 1px solid rgba(27,79,138,0.25);
+    padding: 10px 12px;
+    text-align: center;
+  }
+
+  .tech-name { color: #fff; font-size: 11px; font-weight: 700; }
+  .tech-desc { color: #556677; font-size: 10px; margin-top: 2px; }
+
+  .security-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .security-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: #8899aa;
+  }
+
+  .security-item::before {
+    content: '✓';
+    color: #00d4ff;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+
+  .stat {
+    background: rgba(27,79,138,0.12);
+    border: 1px solid rgba(27,79,138,0.3);
+    padding: 12px;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: #00d4ff;
+    display: block;
+  }
+
+  .stat-label { color: #556677; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; }
+
+  .footer {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(27,79,138,0.4);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .github-link {
+    color: #00d4ff;
+    font-size: 11px;
+  }
+
+  .github-link .label { color: #556677; font-size: 10px; display: block; margin-bottom: 2px; }
+
+  .demo-badge {
+    background: rgba(0,212,255,0.1);
+    border: 1px solid #00d4ff;
+    color: #00d4ff;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 6px 14px;
+    text-transform: uppercase;
+  }
+
+  .sprint { color: #556677; font-size: 10px; text-align: right; }
+  .sprint strong { color: #8899aa; display: block; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="grid-bg"></div>
+  <div class="content">
+
+    <div class="header">
+      <div>
+        <div class="badge">Capstone Project — AI Service</div>
+        <h1>Security Incident<br><span>Metrics Dashboard</span></h1>
+      </div>
+      <div class="tool-id">
+        <span class="num">Tool-58</span>
+        AI Module
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat">
+        <span class="stat-num">3</span>
+        <span class="stat-label">AI Endpoints</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">55</span>
+        <span class="stat-label">Tests Passing</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">70B</span>
+        <span class="stat-label">Model Params</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">15m</span>
+        <span class="stat-label">Cache TTL</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">AI Endpoints</div>
+      <div class="endpoints">
+        <div class="endpoint">
+          <div class="endpoint-method">
+            <span class="method-badge">POST</span>
+            <span class="endpoint-path">/describe</span>
+          </div>
+          <div>
+            <div class="endpoint-desc">Analyzes a security incident and returns a structured breakdown — summary, attack vector, impact, indicators, and severity justification.</div>
+            <div class="endpoint-returns">Returns: <span>summary, attack_vector, impact, indicators, severity_justification</span></div>
+          </div>
+        </div>
+        <div class="endpoint">
+          <div class="endpoint-method">
+            <span class="method-badge">POST</span>
+            <span class="endpoint-path">/recommend</span>
+          </div>
+          <div>
+            <div class="endpoint-desc">Generates exactly 3 prioritized remediation recommendations — containment, eradication, and prevention — for any security incident.</div>
+            <div class="endpoint-returns">Returns: <span>3 recommendations [ action_type, description, priority ]</span></div>
+          </div>
+        </div>
+        <div class="endpoint">
+          <div class="endpoint-method">
+            <span class="method-badge">POST</span>
+            <span class="endpoint-path">/generate-report</span>
+          </div>
+          <div>
+            <div class="endpoint-desc">Produces a complete professional incident report — executive summary, timeline, technical analysis, impact assessment, and remediation plan.</div>
+            <div class="endpoint-returns">Returns: <span>full report with timeline, analysis, impact, remediation</span></div>
+          </div>
+        </div>
+        <div class="endpoint">
+          <div class="endpoint-method">
+            <span class="method-badge">GET</span>
+            <span class="endpoint-path">/health</span>
+          </div>
+          <div>
+            <div class="endpoint-desc">Service health check with model info, average response time, uptime, and Redis cache status.</div>
+            <div class="endpoint-returns">Returns: <span>status, model, avg_response_time, uptime, cache_enabled</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Tech Stack</div>
+      <div class="tech-grid">
+        <div class="tech-item">
+          <div class="tech-name">Python 3.11 + Flask 3.x</div>
+          <div class="tech-desc">AI microservice — port 5000</div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-name">Groq LLaMA-3.3-70b</div>
+          <div class="tech-desc">AI model — free tier</div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-name">Redis 7</div>
+          <div class="tech-desc">AI response cache — 15min TTL</div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-name">flask-limiter</div>
+          <div class="tech-desc">30 req/min per IP</div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-name">bleach + regex</div>
+          <div class="tech-desc">Input sanitisation</div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-name">Docker + Gunicorn</div>
+          <div class="tech-desc">Container + production server</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Security Features</div>
+      <div class="security-grid">
+        <div class="security-item">14 prompt injection patterns blocked</div>
+        <div class="security-item">HTML stripped on all inputs via bleach</div>
+        <div class="security-item">Rate limiting — 30 req/min per IP</div>
+        <div class="security-item">6 security headers on all responses</div>
+        <div class="security-item">Fallback templates — never crashes</div>
+        <div class="security-item">SHA256 cache keys — no data leaks</div>
+        <div class="security-item">No PII in prompts — verified</div>
+        <div class="security-item">Internal Docker network only</div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="github-link">
+        <span class="label">GitHub Repository</span>
+        github.com/your-team/tool-58
+      </div>
+      <div class="sprint">
+        <strong>Sprint: Apr 14 – May 9, 2026</strong>
+        Demo Day: Friday May 9, 2026
+      </div>
+      <div class="demo-badge">Demo Ready</div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
