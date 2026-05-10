@@ -1,15 +1,23 @@
-# Ignore virtual environment
+# Virtual environment
+.venv/
 venv/
 
-# Ignore IDE files
-.idea/
-
-# Ignore Python cache
+# Python cache
 __pycache__/
 *.pyc
 
-# Ignore environment variables
+# Pytest cache
+.pytest_cache/
+
+# Chroma database
+.chroma/
+
+# Environment variables
 .env
 
-# Ignore PDF files
-*.pdf
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
