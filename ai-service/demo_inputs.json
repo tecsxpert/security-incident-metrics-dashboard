@@ -1,0 +1,33 @@
+{
+  "vpn_compromise": {
+    "title": "Suspicious VPN Login",
+    "description": "Multiple failed VPN logins were followed by a successful login from an unknown source IP. The account accessed remote services outside its normal pattern."
+  },
+  "ransomware": {
+    "title": "Ransomware Activity on Endpoint",
+    "description": "EDR reported malware execution, rapid file encryption behavior, and suspicious process activity on a user workstation."
+  },
+  "phishing_campaign": {
+    "title": "Credential Phishing Campaign",
+    "description": "Multiple users reported phishing emails directing recipients to a credential harvesting page. Authentication alerts followed for several targeted accounts."
+  },
+  "report_incidents": {
+    "incidents": [
+      {
+        "title": "Suspicious VPN Login",
+        "severity": "high",
+        "summary": "Failed VPN logins were followed by successful access from an unknown source IP."
+      },
+      {
+        "title": "Endpoint Malware Alert",
+        "severity": "critical",
+        "summary": "EDR detected malware execution and rapid file encryption behavior on a workstation."
+      },
+      {
+        "title": "Credential Phishing Campaign",
+        "severity": "high",
+        "summary": "Users received credential harvesting emails before authentication alerts appeared for targeted accounts."
+      }
+    ]
+  }
+}
